@@ -99,6 +99,7 @@ const Home = props => {
             onChangeText={props.description}
           />
           <Button title="ADD" onPress={props.add} />
+          <Button title="DELETE ALL" onPress={props.deleteAll} />
         </View>
         <View style={{flex: 1}}>
           <ScrollView>
@@ -297,6 +298,20 @@ const App: () => React$Node = () => {
     setCarList(carList);
   };
 
+  const handleDeleteAll = async () => {
+    await realm.write(async () => {
+      let allCars = realm.objects('Car');
+      realm.delete(allCars); // Deletes all books
+
+      let carList = await realm
+        .objects('Car')
+        .filtered(`persons.userName = "${userData.userName}"`);
+      console.log('carList', carList);
+      setCarList(carList);
+    });
+    console.log('deleted');
+  };
+
   const handleDelete = async item => {
     await realm.write(() => {
       realm.delete(item);
@@ -427,6 +442,7 @@ const App: () => React$Node = () => {
         description={text => setDescription(text)}
         data={carList}
         add={handleAdd}
+        deleteAll={handleDeleteAll}
         delete={item => handleDelete(item)}
       />
     );
